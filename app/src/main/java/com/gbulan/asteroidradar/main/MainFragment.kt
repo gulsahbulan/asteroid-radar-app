@@ -20,6 +20,8 @@ class MainFragment : Fragment() {
 
         binding.viewModel = viewModel
 
+        binding.rvAsteroid.adapter = MainAdapter()
+
         setHasOptionsMenu(true)
 
         return binding.root

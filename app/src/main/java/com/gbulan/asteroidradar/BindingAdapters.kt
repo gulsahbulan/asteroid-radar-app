@@ -1,8 +1,35 @@
 package com.gbulan.asteroidradar
 
+import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
+import androidx.recyclerview.widget.RecyclerView
+import com.gbulan.asteroidradar.main.MainAdapter
+import com.gbulan.asteroidradar.main.NasaApiStatus
+
+@BindingAdapter("listData")
+fun bindRecyclerView(recyclerView: RecyclerView, data: List<Asteroid>?) {
+    val adapter = recyclerView.adapter as MainAdapter
+    adapter.submitList(data)
+}
+
+@BindingAdapter("nasaApiStatus")
+fun bindStatus(statusImageView: ImageView, status: NasaApiStatus?) {
+    when (status) {
+        NasaApiStatus.LOADING -> {
+            statusImageView.visibility = View.VISIBLE
+            statusImageView.setImageResource(R.drawable.loading_animation)
+        }
+        NasaApiStatus.ERROR -> {
+            statusImageView.visibility = View.VISIBLE
+            statusImageView.setImageResource(R.drawable.ic_connection_error)
+        }
+        NasaApiStatus.DONE -> {
+            statusImageView.visibility = View.GONE
+        }
+    }
+}
 
 @BindingAdapter("statusIcon")
 fun bindAsteroidStatusImage(imageView: ImageView, isHazardous: Boolean) {
