@@ -13,6 +13,7 @@ buildscript {
         version_picasso = '2.71828'
         version_work = '2.5.0'
         version_room = '2.3.0'
+        version_timber= '4.7.1'
     }
     repositories {
         google()

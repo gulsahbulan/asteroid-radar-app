@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 
-import com.gbulan.asteroidradar.Asteroid
+import com.gbulan.asteroidradar.model.Asteroid
 import com.gbulan.asteroidradar.databinding.MainListItemBinding
 
 class MainAdapter : ListAdapter<Asteroid, MainAdapter.ViewHolder>(DiffCallback) {
@@ -22,18 +22,25 @@ class MainAdapter : ListAdapter<Asteroid, MainAdapter.ViewHolder>(DiffCallback) 
         }
     }
 
-    class ViewHolder (private var binding: MainListItemBinding): RecyclerView.ViewHolder(binding.root) {
+    class ViewHolder(private var binding: MainListItemBinding) :
+        RecyclerView.ViewHolder(binding.root) {
         fun bind(asteroid: Asteroid) {
             binding.asteroid = asteroid
             binding.executePendingBindings()
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MainAdapter.ViewHolder {
-        return ViewHolder(MainListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        return ViewHolder(
+            MainListItemBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false
+            )
+        )
     }
 
-    override fun onBindViewHolder(holder: MainAdapter.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val asteroid = getItem(position)
         holder.bind(asteroid)
     }

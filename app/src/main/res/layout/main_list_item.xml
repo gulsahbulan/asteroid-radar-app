@@ -7,13 +7,12 @@
 
         <variable
             name="asteroid"
-            type="com.gbulan.asteroidradar.Asteroid" />
+            type="com.gbulan.asteroidradar.model.Asteroid" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/app_background"
         android:padding="@dimen/spacing_normal">
 
         <TextView

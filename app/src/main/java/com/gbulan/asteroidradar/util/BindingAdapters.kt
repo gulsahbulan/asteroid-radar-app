@@ -1,12 +1,15 @@
-package com.gbulan.asteroidradar
+package com.gbulan.asteroidradar.util
 
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.net.toUri
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.gbulan.asteroidradar.R
 import com.gbulan.asteroidradar.main.MainAdapter
-import com.gbulan.asteroidradar.main.NasaApiStatus
+import com.gbulan.asteroidradar.model.Asteroid
+import com.squareup.picasso.Picasso
 
 @BindingAdapter("listData")
 fun bindRecyclerView(recyclerView: RecyclerView, data: List<Asteroid>?) {
@@ -14,20 +17,20 @@ fun bindRecyclerView(recyclerView: RecyclerView, data: List<Asteroid>?) {
     adapter.submitList(data)
 }
 
-@BindingAdapter("nasaApiStatus")
-fun bindStatus(statusImageView: ImageView, status: NasaApiStatus?) {
-    when (status) {
-        NasaApiStatus.LOADING -> {
-            statusImageView.visibility = View.VISIBLE
-            statusImageView.setImageResource(R.drawable.loading_animation)
-        }
-        NasaApiStatus.ERROR -> {
-            statusImageView.visibility = View.VISIBLE
-            statusImageView.setImageResource(R.drawable.ic_connection_error)
-        }
-        NasaApiStatus.DONE -> {
-            statusImageView.visibility = View.GONE
-        }
+@BindingAdapter("visibleGone")
+fun showHide(view: View, show: Boolean) {
+    view.visibility = if (show) View.VISIBLE else View.GONE
+}
+
+@BindingAdapter("imageUrl")
+fun bindImage(imgView: ImageView, imgUrl: String?) {
+    imgUrl?.let {
+        val imgUri = imgUrl.toUri().buildUpon().scheme("https").build()
+        Picasso.get()
+            .load(imgUri)
+            .placeholder(R.drawable.placeholder_picture_of_day)
+            .error(R.drawable.ic_broken_image)
+            .into(imgView)
     }
 }
 

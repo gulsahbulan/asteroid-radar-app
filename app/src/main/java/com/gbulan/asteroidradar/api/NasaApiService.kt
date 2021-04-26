@@ -1,29 +1,40 @@
 package com.gbulan.asteroidradar.api
 
-import com.gbulan.asteroidradar.Asteroid
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import com.gbulan.asteroidradar.BuildConfig
+import com.gbulan.asteroidradar.util.Constants.BASE_URL
+import com.gbulan.asteroidradar.model.PictureOfDay
+
 import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.GET
+import retrofit2.http.Query
 
-private const val BASE_URL = "http://localhost:8000"
+interface NasaApiService {
 
-private val moshi = Moshi.Builder()
-    .add(KotlinJsonAdapterFactory())
-    .build()
+    @Retention(AnnotationRetention.RUNTIME)
+    annotation class Scalar
 
-private val retrofit = Retrofit.Builder()
-    .addConverterFactory(MoshiConverterFactory.create(moshi))
-    .baseUrl(BASE_URL)
-    .build()
+    @Retention(AnnotationRetention.RUNTIME)
+    annotation class Json
 
-interface NasaApiService  {
+    @GET("neo/rest/v1/feed/")
+    @Scalar
+    suspend fun getAsteroids(
+        @Query("api_key") apiKey: String = BuildConfig.API_KEY
+    ): String
 
-    @GET("test.json")
-    suspend fun getProperties(): List<Asteroid>
+    @GET("planetary/apod")
+    @Json
+    suspend fun getPictureOfDay(
+        @Query("api_key") apiKey: String = BuildConfig.API_KEY
+    ): PictureOfDay
 }
 
 object NasaApi {
-    val retrofitService : NasaApiService by lazy { retrofit.create(NasaApiService::class.java) }
+    private val retrofit = Retrofit.Builder()
+        .baseUrl(BASE_URL)
+        .addConverterFactory(ScalarOrJsonConverterFactory.create())
+        .build()
+
+    val retrofitService: NasaApiService by lazy { retrofit.create(NasaApiService::class.java) }
 }
+
