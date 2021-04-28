@@ -3,6 +3,7 @@ package com.gbulan.asteroidradar.database
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import com.gbulan.asteroidradar.network.getFormattedDate
 
 @Dao
 interface AsteroidDao {
@@ -11,6 +12,11 @@ interface AsteroidDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAsteroids(asteroids: List<DatabaseAsteroid>)
+
+    @Query("DELETE FROM asteroids_table WHERE closeApproachDate < :currentDate")
+    suspend fun clearOutdatedAsteroid(
+        currentDate: String = getFormattedDate()
+    )
 }
 
 @Database(entities = [DatabaseAsteroid::class], version = 1, exportSchema = false)

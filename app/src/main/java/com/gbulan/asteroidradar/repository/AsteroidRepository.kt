@@ -9,9 +9,14 @@ import com.gbulan.asteroidradar.network.parseAsteroidsJsonResult
 import com.gbulan.asteroidradar.database.AsteroidDao
 import com.gbulan.asteroidradar.database.asDomainModel
 import com.gbulan.asteroidradar.network.asDatabaseModel
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.json.JSONObject
 
-class AsteroidRepository(private val apiService: NasaApiService, private val asteroidDao: AsteroidDao) {
+class AsteroidRepository(private val apiService: NasaApiService,
+                         private val asteroidDao: AsteroidDao,
+                         private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO) {
 
     val asteroids: LiveData<List<Asteroid>> =
         Transformations.map(asteroidDao.getAsteroids()) {
@@ -19,16 +24,24 @@ class AsteroidRepository(private val apiService: NasaApiService, private val ast
         }
 
     suspend fun getPictureOfDay(): PictureOfDay {
-        return apiService.getPictureOfDay()
+        return withContext(ioDispatcher) {
+            apiService.getPictureOfDay()
+        }
     }
 
     suspend fun refreshAsteroids() {
-        try {
-            val asteroids = parseAsteroidsJsonResult(JSONObject(apiService.getAsteroids()))
-            asteroidDao.insertAsteroids(asteroids.asDatabaseModel())
-        } catch (e: Throwable) {
-            throw GetAsteroidsError("Unable to refresh Asteroids data", e)
+        withContext(ioDispatcher) {
+            try {
+                val asteroids = parseAsteroidsJsonResult(JSONObject(apiService.getAsteroids()))
+                asteroidDao.insertAsteroids(asteroids.asDatabaseModel())
+            } catch (e: Throwable) {
+                throw GetAsteroidsError("Unable to refresh Asteroids data", e)
+            }
         }
+    }
+
+    suspend fun clearOutdatedAsteroid() = withContext(ioDispatcher) {
+        asteroidDao.clearOutdatedAsteroid()
     }
 }
 
