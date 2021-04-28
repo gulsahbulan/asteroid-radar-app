@@ -1,21 +1,33 @@
 package com.gbulan.asteroidradar.repository
 
-import com.gbulan.asteroidradar.model.Asteroid
-import com.gbulan.asteroidradar.model.PictureOfDay
-import com.gbulan.asteroidradar.api.NasaApiService
-import com.gbulan.asteroidradar.api.parseAsteroidsJsonResult
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Transformations
+import com.gbulan.asteroidradar.domain.Asteroid
+import com.gbulan.asteroidradar.domain.PictureOfDay
+import com.gbulan.asteroidradar.network.NasaApiService
+import com.gbulan.asteroidradar.network.parseAsteroidsJsonResult
+import com.gbulan.asteroidradar.database.AsteroidDao
+import com.gbulan.asteroidradar.database.asDomainModel
+import com.gbulan.asteroidradar.network.asDatabaseModel
 import org.json.JSONObject
 
-class AsteroidRepository(private val apiService: NasaApiService) {
+class AsteroidRepository(private val apiService: NasaApiService, private val asteroidDao: AsteroidDao) {
+
+    val asteroids: LiveData<List<Asteroid>> =
+        Transformations.map(asteroidDao.getAsteroids()) {
+            it.asDomainModel()
+        }
+
     suspend fun getPictureOfDay(): PictureOfDay {
         return apiService.getPictureOfDay()
     }
 
-    suspend fun getAsteroids(): List<Asteroid> {
-        return try {
-            parseAsteroidsJsonResult(JSONObject(apiService.getAsteroids()))
+    suspend fun refreshAsteroids() {
+        try {
+            val asteroids = parseAsteroidsJsonResult(JSONObject(apiService.getAsteroids()))
+            asteroidDao.insertAsteroids(asteroids.asDatabaseModel())
         } catch (e: Throwable) {
-            throw GetAsteroidsError("Unable to retrieve Asteroids data", e)
+            throw GetAsteroidsError("Unable to refresh Asteroids data", e)
         }
     }
 }

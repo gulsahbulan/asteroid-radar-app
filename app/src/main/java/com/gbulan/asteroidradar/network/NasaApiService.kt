@@ -1,8 +1,8 @@
-package com.gbulan.asteroidradar.api
+package com.gbulan.asteroidradar.network
 
 import com.gbulan.asteroidradar.BuildConfig
 import com.gbulan.asteroidradar.util.Constants.BASE_URL
-import com.gbulan.asteroidradar.model.PictureOfDay
+import com.gbulan.asteroidradar.domain.PictureOfDay
 
 import retrofit2.Retrofit
 import retrofit2.http.GET

@@ -8,7 +8,8 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.gbulan.asteroidradar.R
-import com.gbulan.asteroidradar.api.NasaApi
+import com.gbulan.asteroidradar.network.NasaApi
+import com.gbulan.asteroidradar.database.getDatabase
 import com.gbulan.asteroidradar.databinding.FragmentMainBinding
 import com.google.android.material.snackbar.Snackbar
 
@@ -16,7 +17,7 @@ class MainFragment : Fragment() {
     private val viewModel: MainViewModel by lazy {
         ViewModelProvider(
             this, MainViewModel.Factory(
-                NasaApi.retrofitService
+                NasaApi.retrofitService, getDatabase(requireContext()).asteroidDao
             )
         ).get(MainViewModel::class.java)
     }

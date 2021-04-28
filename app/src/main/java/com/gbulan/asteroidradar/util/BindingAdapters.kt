@@ -8,7 +8,7 @@ import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.gbulan.asteroidradar.R
 import com.gbulan.asteroidradar.main.MainAdapter
-import com.gbulan.asteroidradar.model.Asteroid
+import com.gbulan.asteroidradar.domain.Asteroid
 import com.squareup.picasso.Picasso
 
 @BindingAdapter("listData")

@@ -1,4 +1,4 @@
-package com.gbulan.asteroidradar.model
+package com.gbulan.asteroidradar.domain
 
 import com.squareup.moshi.Json
 

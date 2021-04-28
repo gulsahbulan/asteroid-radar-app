@@ -60,7 +60,7 @@ dependencies {
     // Picasso
     implementation "com.squareup.picasso:picasso:$version_picasso"
     // Room
-//    implementation  'androidx.room:room-ktx:2.3.0'
+    implementation  "androidx.room:room-ktx:$version_room"
     implementation "androidx.room:room-runtime:$version_room"
     kapt "androidx.room:room-compiler:$version_room"
     // Work

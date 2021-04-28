@@ -1,18 +1,16 @@
 package com.gbulan.asteroidradar.main
 
 import androidx.lifecycle.*
-import com.gbulan.asteroidradar.model.Asteroid
-import com.gbulan.asteroidradar.model.PictureOfDay
-import com.gbulan.asteroidradar.api.NasaApiService
+import com.gbulan.asteroidradar.domain.PictureOfDay
+import com.gbulan.asteroidradar.network.NasaApiService
+import com.gbulan.asteroidradar.database.AsteroidDao
 import com.gbulan.asteroidradar.repository.AsteroidRepository
 import com.gbulan.asteroidradar.repository.GetAsteroidsError
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class MainViewModel(private val asteroidRepository: AsteroidRepository) : ViewModel() {
-    private val _asteroids = MutableLiveData<List<Asteroid>>()
-    val asteroids: LiveData<List<Asteroid>>
-        get() = _asteroids
+    val asteroids = asteroidRepository.asteroids
 
     private val _pictureOfDay = MutableLiveData<PictureOfDay>()
     val pictureOfDay: LiveData<PictureOfDay>
@@ -28,17 +26,17 @@ class MainViewModel(private val asteroidRepository: AsteroidRepository) : ViewMo
 
     init {
         getPictureOfDay()
-        getAsteroids()
+        refreshAsteroids()
     }
 
     fun onSnackBarShown() {
         _snackBar.value = null
         getPictureOfDay()
-        getAsteroids()
+        refreshAsteroids()
     }
 
-    private fun getAsteroids() = launchDataLoad {
-        _asteroids.value = asteroidRepository.getAsteroids()
+    private fun refreshAsteroids() = launchDataLoad {
+        asteroidRepository.refreshAsteroids()
     }
 
     private fun launchDataLoad(block: suspend () -> Unit): Unit {
@@ -47,7 +45,7 @@ class MainViewModel(private val asteroidRepository: AsteroidRepository) : ViewMo
                 _spinner.value = true
                 block()
             } catch (error: GetAsteroidsError) {
-                Timber.e(error.cause, "Failed to get Nasa Asteroids data.")
+                Timber.e(error.cause, "Unable to refresh Nasa Asteroids data.")
                 _snackBar.value = error.message
             } finally {
                 _spinner.value = false
@@ -65,11 +63,11 @@ class MainViewModel(private val asteroidRepository: AsteroidRepository) : ViewMo
         }
     }
 
-    class Factory(private val apiService: NasaApiService) : ViewModelProvider.Factory {
+    class Factory(private val apiService: NasaApiService, private val database: AsteroidDao) : ViewModelProvider.Factory {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")
-                return MainViewModel(AsteroidRepository(apiService)) as T
+                return MainViewModel(AsteroidRepository(apiService, database)) as T
             }
             throw IllegalArgumentException("Unable to construct viewmodel")
         }
