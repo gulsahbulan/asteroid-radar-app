@@ -30,6 +30,7 @@
                 android:adjustViewBounds="true"
                 android:contentDescription="@string/image_of_the_day"
                 android:scaleType="centerCrop"
+                app:imageOfTheDayContentDescription="@{viewModel.pictureOfDay.title}"
                 app:imageUrl="@{viewModel.pictureOfDay.mediaType.equals(`image`) ? viewModel.pictureOfDay.url : null}"
                 app:srcCompat="@drawable/placeholder_picture_of_day" />
 
@@ -39,7 +40,6 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
                 android:background="@color/title_background"
-                android:contentDescription="@string/image_of_the_day"
                 android:padding="@dimen/spacing_normal"
                 android:text="@{viewModel.pictureOfDay.title ?? @string/image_of_the_day}"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6" />

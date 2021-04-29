@@ -69,3 +69,31 @@ fun bindTextViewToDisplayVelocity(textView: TextView, number: Double) {
     val context = textView.context
     textView.text = String.format(context.getString(R.string.km_s_unit_format), number)
 }
+
+
+@BindingAdapter("asteroidStatusImageContentDescription")
+fun bindAsteroidStatusImageContentDescription(imageView: ImageView, isHazardous: Boolean) {
+    val context = imageView.context
+    if (isHazardous) {
+        imageView.contentDescription = context.getString(R.string.potentially_hazardous_asteroid_image)
+    } else {
+        imageView.contentDescription = context.getString(R.string.not_hazardous_asteroid_image)
+    }
+}
+
+
+@BindingAdapter("imageOfTheDayContentDescription")
+fun bindImageOfTheDayContentDescription(imageView: ImageView, title: String?) {
+    val context = imageView.context
+    if (title != null) {
+        imageView.contentDescription = String.format(
+            context.getString(R.string.nasa_picture_of_day_content_description_format),
+            title
+        )
+    } else {
+        imageView.contentDescription = String.format(
+            context.getString(R.string.this_is_nasa_s_picture_of_day_showing_nothing_yet),
+            title
+        )
+    }
+}
