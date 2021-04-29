@@ -8,9 +8,18 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:textColor">@color/default_text_color</item>
         <item name="android:itemTextAppearance">@style/menuItemColor</item>
+        <item name="alertDialogTheme">@style/AlertDialogTheme</item>
     </style>
 
     <style name="menuItemColor">
         <item name="android:textColor">@android:color/black</item>
+    </style>
+
+    <style name="AlertDialogTheme" parent="ThemeOverlay.AppCompat.Dialog.Alert">
+        <item name="buttonBarPositiveButtonStyle">@style/PositiveButtonStyle</item>
+    </style>
+
+    <style name="PositiveButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:textColor">@color/colorAccent</item>
     </style>
 </resources>

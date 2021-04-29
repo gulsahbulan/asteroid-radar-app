@@ -1,6 +1,7 @@
 package com.gbulan.asteroidradar.main
 
 import androidx.lifecycle.*
+import com.gbulan.asteroidradar.domain.Asteroid
 import com.gbulan.asteroidradar.domain.PictureOfDay
 import com.gbulan.asteroidradar.network.NasaApiService
 import com.gbulan.asteroidradar.database.AsteroidDao
@@ -11,11 +12,15 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class MainViewModel(private val asteroidRepository: AsteroidRepository) : ViewModel() {
-    private val periodOfAsteroidsData = MutableLiveData<Period>(Period.WEEK)
+    private val periodOfAsteroidsData = MutableLiveData(Period.WEEK)
 
     val asteroids = Transformations.switchMap(periodOfAsteroidsData) {
         asteroidRepository.getAsteroids(it)
     }
+
+    private var _navigateToSelectedAsteroid = MutableLiveData<Asteroid?>()
+    val navigateToSelectedAsteroid: LiveData<Asteroid?>
+        get() = _navigateToSelectedAsteroid
 
     private val _pictureOfDay = MutableLiveData<PictureOfDay>()
     val pictureOfDay: LiveData<PictureOfDay>
@@ -44,7 +49,7 @@ class MainViewModel(private val asteroidRepository: AsteroidRepository) : ViewMo
         asteroidRepository.refreshAsteroids()
     }
 
-    private fun launchDataLoad(block: suspend () -> Unit): Unit {
+    private fun launchDataLoad(block: suspend () -> Unit) {
         viewModelScope.launch {
             try {
                 _spinner.value = true
@@ -78,6 +83,14 @@ class MainViewModel(private val asteroidRepository: AsteroidRepository) : ViewMo
 
     fun showSavedAsteroids() {
         periodOfAsteroidsData.value = Period.ALL
+    }
+
+    fun displayAsteroidDetails(asteroid: Asteroid) {
+        _navigateToSelectedAsteroid.value = asteroid
+    }
+
+    fun displayAsteroidDetailsComplete() {
+        _navigateToSelectedAsteroid.value = null
     }
 
     class Factory(private val apiService: NasaApiService, private val database: AsteroidDao) : ViewModelProvider.Factory {

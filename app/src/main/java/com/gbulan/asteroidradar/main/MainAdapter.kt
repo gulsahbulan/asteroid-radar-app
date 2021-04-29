@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.gbulan.asteroidradar.domain.Asteroid
 import com.gbulan.asteroidradar.databinding.MainListItemBinding
 
-class MainAdapter : ListAdapter<Asteroid, MainAdapter.ViewHolder>(DiffCallback) {
+class MainAdapter(private val onclickListener: OnclickListener) : ListAdapter<Asteroid, MainAdapter.ViewHolder>(DiffCallback) {
 
     companion object DiffCallback : DiffUtil.ItemCallback<Asteroid>() {
         override fun areItemsTheSame(oldItem: Asteroid, newItem: Asteroid): Boolean {
@@ -42,7 +42,14 @@ class MainAdapter : ListAdapter<Asteroid, MainAdapter.ViewHolder>(DiffCallback) 
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val asteroid = getItem(position)
+        holder.itemView.setOnClickListener {
+            onclickListener.onClick(asteroid)
+        }
         holder.bind(asteroid)
+    }
+
+    class OnclickListener(val clickListener: (asteroid: Asteroid) -> Unit) {
+        fun onClick(asteroid: Asteroid) = clickListener(asteroid)
     }
 }
 

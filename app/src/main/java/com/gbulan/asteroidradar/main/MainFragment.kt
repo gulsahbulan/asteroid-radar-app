@@ -7,6 +7,7 @@ import androidx.annotation.RequiresApi
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.gbulan.asteroidradar.R
 import com.gbulan.asteroidradar.network.NasaApi
 import com.gbulan.asteroidradar.database.getDatabase
@@ -30,22 +31,31 @@ class MainFragment : Fragment() {
         val binding = FragmentMainBinding.inflate(inflater)
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
-        binding.rvAsteroid.adapter = MainAdapter()
+        binding.rvAsteroid.adapter = MainAdapter(MainAdapter.OnclickListener {
+            viewModel.displayAsteroidDetails(it)
+        })
         val constraintLayout: ConstraintLayout = binding.constraintLayoutMainFragment
 
         viewModel.snackBar.observe(viewLifecycleOwner) { text ->
             text?.let {
                 val snackBar: Snackbar =
                     Snackbar.make(constraintLayout, text, Snackbar.LENGTH_INDEFINITE)
-                snackBar.setAction("RETRY", View.OnClickListener {
+                snackBar.setAction("RETRY") {
                     viewModel.onSnackBarShown()
-                })
+                }
                 snackBar.setActionTextColor(
                     resources.getColor(R.color.colorAccent, requireContext().theme)
                 )
                 snackBar.show()
             }
         }
+
+        viewModel.navigateToSelectedAsteroid.observe(viewLifecycleOwner, {
+            if (it != null) {
+                findNavController().navigate(MainFragmentDirections.actionShowDetail(it))
+                viewModel.displayAsteroidDetailsComplete()
+            }
+        })
 
         setHasOptionsMenu(true)
         return binding.root
