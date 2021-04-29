@@ -6,11 +6,16 @@ import com.gbulan.asteroidradar.network.NasaApiService
 import com.gbulan.asteroidradar.database.AsteroidDao
 import com.gbulan.asteroidradar.repository.AsteroidRepository
 import com.gbulan.asteroidradar.repository.GetAsteroidsError
+import com.gbulan.asteroidradar.repository.Period
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class MainViewModel(private val asteroidRepository: AsteroidRepository) : ViewModel() {
-    val asteroids = asteroidRepository.asteroids
+    private val periodOfAsteroidsData = MutableLiveData<Period>(Period.WEEK)
+
+    val asteroids = Transformations.switchMap(periodOfAsteroidsData) {
+        asteroidRepository.getAsteroids(it)
+    }
 
     private val _pictureOfDay = MutableLiveData<PictureOfDay>()
     val pictureOfDay: LiveData<PictureOfDay>
@@ -61,6 +66,18 @@ class MainViewModel(private val asteroidRepository: AsteroidRepository) : ViewMo
                 Timber.e("Failed to get PictureOfDay data. %s", e.message)
             }
         }
+    }
+
+    fun showWeekAsteroids() {
+        periodOfAsteroidsData.value = Period.WEEK
+    }
+
+    fun showTodayAsteroids() {
+        periodOfAsteroidsData.value = Period.TODAY
+    }
+
+    fun showSavedAsteroids() {
+        periodOfAsteroidsData.value = Period.ALL
     }
 
     class Factory(private val apiService: NasaApiService, private val database: AsteroidDao) : ViewModelProvider.Factory {

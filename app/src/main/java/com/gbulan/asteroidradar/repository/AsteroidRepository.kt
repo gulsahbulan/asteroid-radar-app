@@ -14,14 +14,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 
+enum class Period { WEEK, TODAY, ALL }
+
 class AsteroidRepository(private val apiService: NasaApiService,
                          private val asteroidDao: AsteroidDao,
                          private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO) {
-
-    val asteroids: LiveData<List<Asteroid>> =
-        Transformations.map(asteroidDao.getAsteroids()) {
-            it.asDomainModel()
-        }
 
     suspend fun getPictureOfDay(): PictureOfDay {
         return withContext(ioDispatcher) {
@@ -42,6 +39,16 @@ class AsteroidRepository(private val apiService: NasaApiService,
 
     suspend fun clearOutdatedAsteroid() = withContext(ioDispatcher) {
         asteroidDao.clearOutdatedAsteroid()
+    }
+
+    fun getAsteroids(period: Period): LiveData<List<Asteroid>> {
+        val result = when (period) {
+            Period.ALL -> asteroidDao.getAsteroids()
+            Period.WEEK -> asteroidDao.getWeekAsteroids()
+            Period.TODAY -> asteroidDao.getTodayAsteroids()
+        }
+        return Transformations.map(result) {
+            it.asDomainModel() }
     }
 }
 
